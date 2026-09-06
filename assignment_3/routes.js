@@ -3,16 +3,24 @@ const fs = require('fs');
 function requestHandler(req, res){
     const url = req.url;
     const method = req.method;
+    const users = ['User1', 'User2']
 
     if (url === '/') {
         res.write('<html>')
-        res.write('<head><title>Enter Message</title></head>')
-        res.write('<body><form action="/message" method="POST"><input type="text" name="message"/><button>Send</button></form></body>')
+        res.write('<head><title>Good Morning</title></head>')
+        res.write('<body>')
+        res.write('<ul>')
+        for (let user of users){
+            res.write("<li>"+ user +"</li>")
+        }
+        res.write('</ul>')
+        res.write('<form action="/create-user" method="POST"><input type="text" name="username"/><button>Send</button></form>')
+        res.write('</body>')
         res.write('</html>')
         return res.end();
     }
 
-    if (url === '/message' && method === 'POST') {
+    if (url === '/create-user' && method === 'POST') {
         const body = [];
 
         req.on('data', (chunk) => {
@@ -23,9 +31,8 @@ function requestHandler(req, res){
         // These are callbacks. Wont run immediately but in the future
         req.on('end', () => {
             const parsedBody = Buffer.concat(body).toString();
-            console.log(parsedBody);
             const message = parsedBody.split('=')[1];
-            fs.writeFileSync('message.txt', message);
+            console.log(message)
             res.statusCode = 302;
             res.setHeader('Location', '/');
             return res.end();
